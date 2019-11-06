@@ -1,9 +1,9 @@
 # Create virtual machine
  resource "random_password" "password" {
     count        = "${length(var.VM)}"
-    length            = 16
-    special           = true
-    override_special  = "_%@"
+    length            = 14
+    special           = false # Windows doesn't support special caracters
+    #verride_special  = ""
   }
   resource "azurerm_key_vault_secret" "VMSecretCreation" {
     count        = "${length(var.VM)}"
