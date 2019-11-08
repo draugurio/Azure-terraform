@@ -1,4 +1,5 @@
 # Create virtual machine
+# Create virtual machine
  resource "random_password" "password" {
     count        = "${length(var.VM)}"
     length            = 16
@@ -14,7 +15,6 @@
     tags         = "${var.Tags}"
  }
 
-
 resource "azurerm_virtual_machine" "WindowsVM"{
     count                 = "${length(var.VM)}"
     name =                  "${var.VM[count.index]}"
@@ -22,7 +22,7 @@ resource "azurerm_virtual_machine" "WindowsVM"{
     location =              "${var.location}"
     network_interface_ids =  "${var.network_interface_ids}"
     vm_size =               "Standard_DS2_v2"
-    tags                    = "${var.Tags}"
+
       storage_image_reference {
             publisher = "MicrosoftWindowsServer"
             offer     = "WindowsServer"
@@ -34,21 +34,22 @@ resource "azurerm_virtual_machine" "WindowsVM"{
           create_option     = "FromImage"
           caching           = "ReadWrite"
           managed_disk_type = "Standard_LRS"
-          disk_size_gb      = "40"
+          os_type           = "Windows"
       }
       os_profile{
-        computer_name   = "Hostname-${var.VM[count.index]}"
+        computer_name   = "${var.VM[count.index]}"
         admin_username = "${var.admin_username}"
         admin_password = "${azurerm_key_vault_secret.VMSecretCreation[count.index].value}"
       }
         os_profile_windows_config {
-         provision_vm_agent        = true
-         enable_automatic_upgrades = true
+        provision_vm_agent        = true
+        enable_automatic_upgrades = true
       }
       /*boot_diagnostics {
         enabled     = "${var.boot_diagnostics}"
         storage_uri = "${var.BootDiagnostic == "true" ? join(",", azurerm_storage_account.StorageAccount.*.primary_blob_endpoint) : "" }"
       }*/
+    tags                    = "${var.Tags}"
   }
 
 
